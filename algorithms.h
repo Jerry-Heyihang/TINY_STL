@@ -1,0 +1,4 @@
+#ifndef _TINY_ALGORITHMS_H_
+#define _TINY_ALGORITHMS_H_
+
+#endif // _TINY_ALGORITHMS_H_
