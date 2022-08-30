@@ -2,6 +2,10 @@
 #define _TINY_ITERATOR_H_
 
 #include <cstddef>
+#include "allocator.h"
+#include "construct.h"
+
+using namespace tinySTL;
 
 namespace tinySTL {
     struct input_iterator_tag {};
@@ -117,6 +121,51 @@ namespace tinySTL {
     template <class InputIterator, class Distance>
     inline void advance(InputIterator& i, Distance n) {
         __advance(i, n, iterator_category(i));
+    }
+
+    template <class InputIterator, class ForwardIterator>
+    ForwardIterator uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result) {
+        ForwardIterator cur = result;
+        try {
+            while (first != last) {
+                construct(&*cur, *first);
+                ++first;
+                ++cur;
+            }
+        } catch (...) {
+            destroy(result, cur);
+            throw;
+        }
+        return cur;
+    }
+
+    template <class ForwardIterator, class T>
+    void uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& x) {
+        ForwardIterator cur = first;
+        try {
+            while (cur != last) {
+                construct(&*cur, x);
+                ++cur;
+            }
+        } catch (...) {
+            destroy(first, cur);
+            throw;
+        }
+    }
+
+    template <class ForwardIterator, class Size, class T>
+    ForwardIterator uninitialized_fill_n(ForwardIterator first, Size n, const T& x) {
+        ForwardIterator cur = first;
+        try {
+            while (n--) {
+                construct(&*cur, x);
+                ++cur;
+            }
+        } catch (...) {
+            destroy(first, cur);
+            throw;
+        }
+        return cur;
     }
 }
 

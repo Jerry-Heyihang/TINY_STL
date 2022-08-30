@@ -4,44 +4,44 @@
 #include <cstddef>
 #include <new>
 #include <algorithm>
+#include "construct.h"
 
 using std::move;
+using namespace tinySTL;
 
 namespace tinySTL {
     template <class T>
     class allocator {
     public:
-        typedef T            value_type;
-        typedef T*           pointer;
-        typedef const T*     const_pointer;
-        typedef T&           reference;
-        typedef const T&     const_reference;
-        typedef size_t       size_type;
-        typedef ptrdiff_t    difference_type;
+        typedef T                       value_type;
+        typedef T*                      pointer;
+        typedef const T*                const_pointer;
+        typedef T&                      reference;
+        typedef const T&                const_reference;
+        typedef size_t                  size_type;
+        typedef ptrdiff_t               difference_type;
 
-        pointer allocate();
-        pointer allocate(size_type n);
+        static pointer allocate();
+        static pointer allocate(size_type n);
 
-        void deallocate(pointer ptr);
-        void deallocate(pointer ptr, size_type n);
+        static void deallocate(pointer ptr);
+        static void deallocate(pointer ptr, size_type n);
 
-        void construct(pointer ptr);
-        void construct(pointer ptr, const_reference value);
-        void construct(pointer ptr, value_type&& value);
+        static void construct(pointer ptr);
+        static void construct(pointer ptr, const_reference value);
+        static void construct(pointer ptr, value_type&& value);
 
-        void destroy(pointer ptr);
-        void destroy(pointer first, pointer last);
+        static void destroy(pointer ptr);
+        static void destroy(pointer first, pointer last);
     };
 
     template <class T>
-    T* allocator<T>::allocate()
-    {
+    T* allocator<T>::allocate() {
         return static_cast<pointer>(::operator new(sizeof(T)));
     }
 
     template <class T>
-    T* allocator<T>::allocate(size_type n)
-    {
+    T* allocator<T>::allocate(size_type n) {
         if (n == 0) {
             return nullptr;
         }
@@ -49,52 +49,42 @@ namespace tinySTL {
     }
 
     template <class T>
-    void allocator<T>::deallocate(pointer ptr)
-    {
+    void allocator<T>::deallocate(pointer ptr) {
         if (ptr) {
             ::operator delete(ptr);
         }
     }
 
     template <class T>
-    void allocator<T>::deallocate(pointer ptr, size_type n)
-    {
+    void allocator<T>::deallocate(pointer ptr, size_type n) {
         if (ptr) {
             ::operator delete(ptr, n * sizeof(T));
         }
     }
 
     template <class T>
-    void allocator<T>::construct(pointer ptr)
-    {
-        ::new ((void*)ptr) T();
+    void allocator<T>::construct(pointer ptr) {
+        tinySTL::construct(ptr);
     }
 
     template <class T>
-    void allocator<T>::construct(pointer ptr, const_reference value)
-    {
-        ::new ((void*)ptr) T(value);
+    void allocator<T>::construct(pointer ptr, const_reference value) {
+        tinySTL::construct(ptr, value);
     }
 
     template <class T>
-    void allocator<T>::construct(pointer ptr, value_type&& value)
-    {
-        ::new ((void*)ptr) T(move(value));
+    void allocator<T>::construct(pointer ptr, value_type&& value) {
+        tinySTL::construct(ptr, move(value));
     }
 
     template <class T>
-    void allocator<T>::destroy(pointer ptr)
-    {
-        ptr -> ~T();
+    void allocator<T>::destroy(pointer ptr) {
+        tinySTL::destroy(ptr);
     }
 
     template <class T>
-    void allocator<T>::destroy(pointer first, pointer last)
-    {
-        while (first != last) {
-            first -> ~T();
-            ++first;
-        }
+    void allocator<T>::destroy(pointer first, pointer last) {
+        tinySTL::destroy(first, last);
     }
 }
 
