@@ -17,6 +17,9 @@ namespace tinySTL {
         typedef size_t                  size_type;
         typedef ptrdiff_t               difference_type;
         typedef allocator<value_type>   data_allocator;
+        typedef const value_type*       const_pointer;
+        typedef const value_type&       const_reference;
+        typedef const value_type*       const_iterator;
 
     protected:
         iterator start;
@@ -29,10 +32,14 @@ namespace tinySTL {
 
         iterator allocate_and_fill(size_type n, const value_type& value);
 
+        void swap(vector<T, Alloc>& x);
+
+        iterator allocate_and_copy(size_type n, const_iterator first, const_iterator last);
+
     public:
-        iterator begin() { return start; }
-        iterator end() { return finish; }
-        size_type size() { return size_type(finish - start); }
+        iterator begin() const { return start; }
+        iterator end() const { return finish; }
+        size_type size() const { return size_type(finish - start); }
         size_type capacity() const { return size_type(end_of_storage - start); }
         bool empty() { return start == finish; }
         reference operator[](size_type n) { return *(start + n); }
@@ -51,6 +58,11 @@ namespace tinySTL {
         void erase(iterator position);
         void resize(size_type new_size, const value_type& x);
         void clear();
+
+        vector& operator=(const vector& x);
+        vector& operator=(vector&& x) noexcept;
+        vector(const vector& x);
+        vector(vector&& x) noexcept;
     };
 
     template <class T, class Alloc>
@@ -75,6 +87,22 @@ namespace tinySTL {
         iterator result = data_allocator::allocate(n);
         uninitialized_fill_n(result, n, value);
         return result;
+    }
+
+    template <class T, class Alloc>
+    typename vector<T, Alloc>::iterator vector<T, Alloc>::allocate_and_copy(size_type n, const_iterator first, const_iterator last)
+    {
+        iterator result = data_allocator::allocate(n);
+        uninitialized_copy(first, last, result);
+        return result;
+    }
+
+    template <class T, class Alloc>
+    void vector<T, Alloc>::swap(vector<T, Alloc>& x)
+    {
+        tinySTL::swap(start, x.start);
+        tinySTL::swap(finish, x.finish);
+        tinySTL::swap(end_of_storage, x.end_of_storage);
     }
 
     template <class T, class Alloc>
@@ -161,6 +189,58 @@ namespace tinySTL {
         finish = start;
     }
 
+    template <class T, class Alloc>
+    vector<T, Alloc>& vector<T, Alloc>::operator=(const vector& x)
+    {
+        if (this != &x) {
+            const size_type x_size = x.size();
+            if (x_size > capacity()) {
+                vector<T, Alloc> tmp(x);
+                swap(tmp);
+            }
+            else if (size() >= x_size) {
+                iterator i = tinySTL::copy(x.begin(), x.end(), begin());
+                data_allocator::destroy(i, finish);
+            }
+            else {
+                copy(x.start, x.start + size(), start);
+                uninitialized_copy(x.start + size(), x.finish, finish);
+            }
+            finish = start + x_size;
+        }
+        return *this;
+    }
+
+    template <class T, class Alloc>
+    vector<T, Alloc>& vector<T, Alloc>::operator=(vector&& x) noexcept
+    {
+        if (this != &x) {
+            data_allocator::destroy(start, finish);
+            deallocate();
+            start = x.start;
+            finish = x.finish;
+            end_of_storage = x.end_of_storage;
+            x.start = x.finish = x.end_of_storage = nullptr;
+        }
+        return *this;
+    }
+
+    template <class T, class Alloc>
+    vector<T, Alloc>::vector(const vector& x)
+    {
+        start = allocate_and_copy(x.end() - x.begin(), x.begin(), x.end());
+        finish = start + (x.end() - x.begin());
+        end_of_storage = finish;
+    }
+
+    template <class T, class Alloc>
+    vector<T, Alloc>::vector(vector&& x) noexcept
+    {
+        start = x.start;
+        finish = x.finish;
+        end_of_storage = x.end_of_storage;
+        x.start = x.finish = x.end_of_storage = nullptr;
+    }
 }
 
 

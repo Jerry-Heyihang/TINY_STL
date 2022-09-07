@@ -86,6 +86,7 @@ namespace tinySTL {
     void allocator<T>::destroy(pointer first, pointer last) {
         tinySTL::destroy(first, last);
     }
+
 }
 
 #endif // _TINY_ALLOCATOR_H_

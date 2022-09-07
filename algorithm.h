@@ -1,6 +1,8 @@
 #ifndef _TINY_ALGORITHM_H_
 #define _TINY_ALGORITHM_H_
 
+#include <utility>
+
 namespace tinySTL {
 
     template <class RandomAccessIterator>
@@ -41,6 +43,22 @@ namespace tinySTL {
             sort(mid + 1, last);
         }
     }
+
+    template <class InputIterator, class OutputIterator>
+    OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result) {
+        while (first != last) {
+            *result = *first;
+            ++result;
+            ++first;
+        }
+        return result;
+    }
+
+    template <class T>
+    typename std::remove_reference<T>::type&& move(T&& t) noexcept {
+        return static_cast<typename std::remove_reference<T>::type&&>(t);
+    }
+
 }
 
 
