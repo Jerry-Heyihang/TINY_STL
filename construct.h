@@ -3,8 +3,6 @@
 
 #include <new>
 
-using namespace tinySTL;
-
 namespace tinySTL {
     template <class T>
     void construct(T* ptr) {

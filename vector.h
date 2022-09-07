@@ -3,6 +3,7 @@
 
 #include "allocator.h"
 #include "iterator.h"
+#include "algorithm.h"
 
 using tinySTL::allocator;
 

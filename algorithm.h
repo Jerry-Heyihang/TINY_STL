@@ -54,11 +54,25 @@ namespace tinySTL {
         return result;
     }
 
+    template <class BidirectionalIterator1, class BidirectionalIterator2>
+    BidirectionalIterator2 copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last, BidirectionalIterator2 result) {
+        while (first != last) {
+            --last;
+            --result;
+            *result = *last;
+        }
+        return result;
+    }
+
     template <class T>
     typename std::remove_reference<T>::type&& move(T&& t) noexcept {
         return static_cast<typename std::remove_reference<T>::type&&>(t);
     }
 
+    template <class T>
+    const T& max(const T& a, const T& b) {
+        return a < b ? b : a;
+    }
 }
 
 
