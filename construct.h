@@ -2,9 +2,8 @@
 #define _TINY_CONSTRUCT_H_
 
 #include <new>
-#include <algorithm>
 
-using std::move;
+using namespace tinySTL;
 
 namespace tinySTL {
     template <class T>

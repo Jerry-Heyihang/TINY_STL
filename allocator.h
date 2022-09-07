@@ -3,10 +3,8 @@
 
 #include <cstddef>
 #include <new>
-#include <algorithm>
 #include "construct.h"
 
-using std::move;
 using namespace tinySTL;
 
 namespace tinySTL {
